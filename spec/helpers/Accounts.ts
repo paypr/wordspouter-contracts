@@ -23,6 +23,11 @@ import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers';
 export let accounts: SignerWithAddress[] = [];
 
 export let INITIALIZER: SignerWithAddress;
+export let DISABLER: SignerWithAddress;
+export let DIAMOND_CUTTER: SignerWithAddress;
+export let ACCOUNT1: SignerWithAddress;
+export let ACCOUNT2: SignerWithAddress;
+export let ACCOUNT3: SignerWithAddress;
 
 export type OnInitAccountsHandler = (accounts: SignerWithAddress[]) => void | Promise<void>;
 
@@ -35,7 +40,7 @@ export const onInitAccounts = (handler: OnInitAccountsHandler) => {
 export const initAccounts = async () => {
   accounts = await ethers.getSigners();
 
-  [INITIALIZER] = accounts;
+  [INITIALIZER, DISABLER, DIAMOND_CUTTER, ACCOUNT1, ACCOUNT2, ACCOUNT3] = accounts;
 
   await Promise.all(onInitAccountsHandlers.map(async (handler) => await handler(accounts)));
 };
