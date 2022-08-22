@@ -1,4 +1,4 @@
-# CHANGEME
+# Word Spouter Contracts
 
 ## Setup
 
