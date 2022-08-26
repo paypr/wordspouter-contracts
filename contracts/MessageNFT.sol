@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.4;
 
-contract WordSpouterNFT {
+contract MessageNFT {
   uint256 private _data;
 
   function data() external view returns (uint256) {

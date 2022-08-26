@@ -1,6 +1,6 @@
 {
   "author": "The Paypr Company",
-  "name": "@paypr/wordspouter-contracts",
+  "name": "@paypr/message-contracts",
   "description": "",
   "private": true,
   "license": "UNLICENSED",
@@ -8,10 +8,10 @@
   "homepage": "https://paypr.money/",
   "repository": {
     "type": "git",
-    "url": "https://github.com/paypr/wordspouter-contracts"
+    "url": "https://github.com/paypr/message-contracts"
   },
   "bugs": {
-    "url": "https://github.com/paypr/wordspouter-contracts/issues"
+    "url": "https://github.com/paypr/message-contracts/issues"
   },
   "files": [
     "artifacts",
@@ -85,7 +85,7 @@
     }
   },
   "standard-version": {
-    "issueUrlFormat": "https://github.com/paypr/wordspouter-contracts/issues/{{id}}",
+    "issueUrlFormat": "https://github.com/paypr/message-contracts/issues/{{id}}",
     "issuePrefixes": [
       "#"
     ],
