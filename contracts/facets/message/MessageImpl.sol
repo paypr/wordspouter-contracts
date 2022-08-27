@@ -142,10 +142,12 @@ library MessageImpl {
     uint256 id,
     IMessage.MessageContent memory content
   ) private {
-    console.log("%s Posting '%s' to %s", sender, content.text, id);
+    console.log('%s Posting "%s" to %s', sender, content.text, id);
 
     MessageStorage storage ds = _messageStorage();
     ERC721Impl.mint(sender, id);
+
+    // solhint-disable-next-line not-rely-on-time
     ds.core[id] = MessageCore({ createdAt: block.timestamp });
     ds.content[id] = content;
   }
