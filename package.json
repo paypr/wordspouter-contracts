@@ -2,8 +2,7 @@
   "author": "The Paypr Company",
   "name": "@paypr/message-contracts",
   "description": "",
-  "private": true,
-  "license": "UNLICENSED",
+  "license": "GPL-3.0-only",
   "version": "0.0.1",
   "homepage": "https://paypr.money/",
   "repository": {
