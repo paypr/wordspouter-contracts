@@ -23,7 +23,6 @@ pragma solidity ^0.8.9;
 
 import '@openzeppelin/contracts/utils/structs/EnumerableSet.sol';
 import '@paypr/ethereum-contracts/contracts/facets/erc721/ERC721Impl.sol';
-import 'hardhat/console.sol';
 import './IMessage.sol';
 
 library MessageImpl {
@@ -101,13 +100,9 @@ library MessageImpl {
       }
 
       if (isRepost(content)) {
-        console.log('This message is a repost');
-
         uint256 otherMessageRef = messageRef(content.messageRef);
         if (otherMessageRef != 0) {
           if (isRepost(_content(otherMessageRef))) {
-            console.log('Other message is a repost. Using other id %s', otherMessageRef);
-
             content.messageRef = otherMessageRef;
             id = hashContent(sender, content);
           }
@@ -124,7 +119,6 @@ library MessageImpl {
     }
 
     if (!isRepost(content) && _exists(id)) {
-      console.log('Forcing this message to be a repost');
       content = IMessage.MessageContent({ text: '', uri: '', uriType: IMessage.URIType.None, messageRef: id });
       id = hashContent(sender, content);
     }
@@ -132,7 +126,6 @@ library MessageImpl {
     _postMessage(sender, id, content);
 
     if (content.messageRef != 0) {
-      console.log('Adding reply to %s: %s', content.messageRef, id);
       _replies(content.messageRef).add(bytes32(id));
     }
   }
@@ -142,8 +135,6 @@ library MessageImpl {
     uint256 id,
     IMessage.MessageContent memory content
   ) private {
-    console.log('%s Posting "%s" to %s', sender, content.text, id);
-
     MessageStorage storage ds = _messageStorage();
     ERC721Impl.mint(sender, id);
 
