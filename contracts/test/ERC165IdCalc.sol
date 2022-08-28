@@ -23,6 +23,7 @@ pragma solidity ^0.8.9;
 
 import '../facets/reaction/ILikable.sol';
 import '../facets/message/IMessage.sol';
+import '../facets/message/cost/IMessageCost.sol';
 import '../facets/reaction/IReactable.sol';
 
 contract ERC165IdCalc {
@@ -32,6 +33,10 @@ contract ERC165IdCalc {
 
   function calcMessageInterfaceId() external pure returns (bytes4) {
     return type(IMessage).interfaceId;
+  }
+
+  function calcMessageCostInterfaceId() external pure returns (bytes4) {
+    return type(IMessageCost).interfaceId;
   }
 
   function calcReactableInterfaceId() external pure returns (bytes4) {
