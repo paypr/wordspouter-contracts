@@ -17,8 +17,31 @@
  * along with Paypr Contracts.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { toErc165InterfaceId } from '@paypr/ethereum-contracts/dist/src/contracts/erc165InterfaceIds';
+// SPDX-License-Identifier: GPL-3.0-only
 
-export const LIKABLE_INTERFACE_ID = toErc165InterfaceId(0x8e5048a1);
-export const MESSAGE_INTERFACE_ID = toErc165InterfaceId(0xbeda7a76);
-export const MESSAGE_COST_INTERFACE_ID = toErc165InterfaceId(0xa4bc4be7);
+pragma solidity ^0.8.9;
+
+library MessageCostImpl {
+  bytes32 private constant MESSAGE_COST_STORAGE_POSITION = keccak256('paypr.messageCost.storage');
+
+  struct MessageCostStorage {
+    uint256 basicCost;
+  }
+
+  //noinspection NoReturn
+  function _messageCostStorage() private pure returns (MessageCostStorage storage ds) {
+    bytes32 position = MESSAGE_COST_STORAGE_POSITION;
+    // solhint-disable-next-line no-inline-assembly
+    assembly {
+      ds.slot := position
+    }
+  }
+
+  function basicCost() internal view returns (uint256) {
+    return _messageCostStorage().basicCost;
+  }
+
+  function setBasicCost(uint256 cost) internal {
+    _messageCostStorage().basicCost = cost;
+  }
+}

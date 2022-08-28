@@ -18,13 +18,15 @@ export const asERC721 = (contract: Contract, signer: Signer = INITIALIZER) =>
 export const asERC721Enumerable = (contract: Contract, signer: Signer = INITIALIZER) =>
   IERC721Enumerable__factory.connect(contract.address, signer);
 
-export const buildERC721Additions = async (): Promise<ExtensibleDiamondOptions> => ({
-  additionalCuts: [
-    buildDiamondFacetCut(await deployERC721Facet()),
-    buildDiamondFacetCut(await deployERC721EnumerableFacet()),
-  ],
-  additionalInits: [buildERC721AddHooksInitFunction(await deployERC721Init(), await deployERC721EnumerableHooks())],
-});
+export const buildERC721Additions = async (): Promise<ExtensibleDiamondOptions> => {
+  return {
+    additionalCuts: [
+      buildDiamondFacetCut(await deployERC721Facet()),
+      buildDiamondFacetCut(await deployERC721EnumerableFacet()),
+    ],
+    additionalInits: [buildERC721AddHooksInitFunction(await deployERC721Init(), await deployERC721EnumerableHooks())],
+  };
+};
 
 export const deployERC721Facet = () => new ERC721Facet__factory(INITIALIZER).deploy();
 export const deployERC721EnumerableFacet = () => new ERC721EnumerableFacet__factory(INITIALIZER).deploy();

@@ -17,8 +17,17 @@
  * along with Paypr Contracts.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { toErc165InterfaceId } from '@paypr/ethereum-contracts/dist/src/contracts/erc165InterfaceIds';
+// SPDX-License-Identifier: GPL-3.0-only
 
-export const LIKABLE_INTERFACE_ID = toErc165InterfaceId(0x8e5048a1);
-export const MESSAGE_INTERFACE_ID = toErc165InterfaceId(0xbeda7a76);
-export const MESSAGE_COST_INTERFACE_ID = toErc165InterfaceId(0xa4bc4be7);
+pragma solidity ^0.8.9;
+
+import './IMessageCost.sol';
+import './MessageCostImpl.sol';
+
+contract BasicMessageCostFacet is IMessageCost {
+  function messageCost(
+    IMessage.MessageContent calldata /*content*/
+  ) external view returns (uint256) {
+    return MessageCostImpl.basicCost();
+  }
+}

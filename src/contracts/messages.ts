@@ -19,12 +19,27 @@
 
 import { BigNumber, BigNumberish } from 'ethers';
 import { defaultAbiCoder, keccak256, ParamType } from 'ethers/lib/utils';
+// noinspection ES6PreferShortImport
+import { IMessage } from '../../types/contracts/contracts/facets/message/IMessage';
+import MessageContentStruct = IMessage.MessageContentStruct;
 
 export enum URIType {
   None,
   Link,
   Image,
 }
+
+export const withMessageContentDefaults = ({
+  text,
+  uri,
+  uriType,
+  messageRef,
+}: Partial<MessageContentStruct>): MessageContentStruct => ({
+  text: text || '',
+  uri: uri || '',
+  uriType: uriType || URIType.None,
+  messageRef: messageRef || 0,
+});
 
 export const hashMessageContent = (
   sender: string,
