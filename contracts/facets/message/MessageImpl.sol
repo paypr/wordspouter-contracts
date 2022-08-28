@@ -136,11 +136,12 @@ library MessageImpl {
     IMessage.MessageContent memory content
   ) private {
     MessageStorage storage ds = _messageStorage();
-    ERC721Impl.mint(sender, id);
 
     // solhint-disable-next-line not-rely-on-time
     ds.core[id] = MessageCore({ createdAt: block.timestamp });
     ds.content[id] = content;
+
+    ERC721Impl.mint(sender, id);
   }
 
   function isRepost(IMessage.MessageContent memory content) internal pure returns (bool) {

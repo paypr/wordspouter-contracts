@@ -21,30 +21,27 @@
 
 pragma solidity ^0.8.9;
 
-import '../facets/reaction/ILikable.sol';
-import '../facets/message/IMessage.sol';
-import '../facets/message/cost/IMessageCost.sol';
-import '../facets/message/limits/IMessageContentLimits.sol';
-import '../facets/reaction/IReactable.sol';
+library MessageContentLimitsImpl {
+  bytes32 private constant MESSAGE_LIMITS_STORAGE_POSITION = keccak256('paypr.message.limits.storage');
 
-contract ERC165IdCalc {
-  function calcLikableInterfaceId() external pure returns (bytes4) {
-    return type(ILikable).interfaceId;
+  struct MessageLimitsStorage {
+    uint256 maxLength;
   }
 
-  function calcMessageInterfaceId() external pure returns (bytes4) {
-    return type(IMessage).interfaceId;
+  //noinspection NoReturn
+  function _messageLimitsStorage() private pure returns (MessageLimitsStorage storage ds) {
+    bytes32 position = MESSAGE_LIMITS_STORAGE_POSITION;
+    // solhint-disable-next-line no-inline-assembly
+    assembly {
+      ds.slot := position
+    }
   }
 
-  function calcMessageContentLimitsInterfaceId() external pure returns (bytes4) {
-    return type(IMessageContentLimits).interfaceId;
+  function maxLength() internal view returns (uint256) {
+    return _messageLimitsStorage().maxLength;
   }
 
-  function calcMessageCostInterfaceId() external pure returns (bytes4) {
-    return type(IMessageCost).interfaceId;
-  }
-
-  function calcReactableInterfaceId() external pure returns (bytes4) {
-    return type(IReactable).interfaceId;
+  function setMaxLength(uint256 len) internal {
+    _messageLimitsStorage().maxLength = len;
   }
 }

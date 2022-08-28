@@ -21,27 +21,11 @@
 
 pragma solidity ^0.8.9;
 
-library MessageCostImpl {
-  bytes32 private constant MESSAGE_COST_STORAGE_POSITION = keccak256('paypr.message.cost.storage');
+import './IMessageContentLimits.sol';
+import './MessageContentLimitsImpl.sol';
 
-  struct MessageCostStorage {
-    uint256 basicCost;
-  }
-
-  //noinspection NoReturn
-  function _messageCostStorage() private pure returns (MessageCostStorage storage ds) {
-    bytes32 position = MESSAGE_COST_STORAGE_POSITION;
-    // solhint-disable-next-line no-inline-assembly
-    assembly {
-      ds.slot := position
-    }
-  }
-
-  function basicCost() internal view returns (uint256) {
-    return _messageCostStorage().basicCost;
-  }
-
-  function setBasicCost(uint256 cost) internal {
-    _messageCostStorage().basicCost = cost;
+contract MessageContentLimitsFacet is IMessageContentLimits {
+  function maxContentLength() external view returns (uint256) {
+    return MessageContentLimitsImpl.maxLength();
   }
 }

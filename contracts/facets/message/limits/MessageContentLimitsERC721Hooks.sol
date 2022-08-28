@@ -21,27 +21,29 @@
 
 pragma solidity ^0.8.9;
 
-library MessageCostImpl {
-  bytes32 private constant MESSAGE_COST_STORAGE_POSITION = keccak256('paypr.message.cost.storage');
+import '@paypr/ethereum-contracts/contracts/facets/erc721/ERC721HooksBase.sol';
+import './IMessageContentLimits.sol';
+import '../IMessage.sol';
 
-  struct MessageCostStorage {
-    uint256 basicCost;
-  }
-
-  //noinspection NoReturn
-  function _messageCostStorage() private pure returns (MessageCostStorage storage ds) {
-    bytes32 position = MESSAGE_COST_STORAGE_POSITION;
-    // solhint-disable-next-line no-inline-assembly
-    assembly {
-      ds.slot := position
+contract MessageContentLimitsERC721Hooks is ERC721HooksBase {
+  function beforeMint(
+    address, /*account*/
+    uint256 tokenId
+  ) external payable virtual override {
+    uint256 maxLength = IMessageContentLimits(address(this)).maxContentLength();
+    if (maxLength == 0) {
+      return;
     }
-  }
 
-  function basicCost() internal view returns (uint256) {
-    return _messageCostStorage().basicCost;
-  }
+    IMessage message = IMessage(address(this));
 
-  function setBasicCost(uint256 cost) internal {
-    _messageCostStorage().basicCost = cost;
+    if (bytes(message.text(tokenId)).length > maxLength) {
+      revert IMessageContentLimits.MessageContentTooLong('text', maxLength);
+    }
+
+    (string memory uri, ) = message.uri(tokenId);
+    if (bytes(uri).length > maxLength) {
+      revert IMessageContentLimits.MessageContentTooLong('uri', maxLength);
+    }
   }
 }
