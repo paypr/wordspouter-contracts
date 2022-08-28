@@ -20,6 +20,7 @@
 import { Erc165InterfaceId } from '@paypr/ethereum-contracts/dist/src/contracts/erc165';
 import {
   LIKABLE_INTERFACE_ID,
+  MESSAGE_CONTENT_LIMITS_INTERFACE_ID,
   MESSAGE_COST_INTERFACE_ID,
   MESSAGE_INTERFACE_ID,
 } from '../../../src/contracts/interfaces';
@@ -33,6 +34,11 @@ type InterfaceTest = [string, Erc165InterfaceId, (ERC165IdCalc) => Promise<Erc16
 const interfaceTests: InterfaceTest[] = [
   ['Likable', LIKABLE_INTERFACE_ID, (idCalc) => idCalc.calcLikableInterfaceId()],
   ['Message', MESSAGE_INTERFACE_ID, (idCalc) => idCalc.calcMessageInterfaceId()],
+  [
+    'MessageContentLimits',
+    MESSAGE_CONTENT_LIMITS_INTERFACE_ID,
+    (idCalc) => idCalc.calcMessageContentLimitsInterfaceId(),
+  ],
   ['MessageCost', MESSAGE_COST_INTERFACE_ID, (idCalc) => idCalc.calcMessageCostInterfaceId()],
 ];
 

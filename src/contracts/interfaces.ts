@@ -21,4 +21,5 @@ import { toErc165InterfaceId } from '@paypr/ethereum-contracts/dist/src/contract
 
 export const LIKABLE_INTERFACE_ID = toErc165InterfaceId(0x8e5048a1);
 export const MESSAGE_INTERFACE_ID = toErc165InterfaceId(0xbeda7a76);
+export const MESSAGE_CONTENT_LIMITS_INTERFACE_ID = toErc165InterfaceId(0x3a8397fe);
 export const MESSAGE_COST_INTERFACE_ID = toErc165InterfaceId(0xa4bc4be7);
