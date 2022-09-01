@@ -1,4 +1,4 @@
-# Word Spouter Contracts
+# Message Contracts
 
 ## Setup
 
