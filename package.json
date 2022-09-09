@@ -42,7 +42,7 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "4.7.3",
-    "@paypr/ethereum-contracts": "1.2.0",
+    "@paypr/ethereum-contracts": "1.2.1",
     "ethers": "5.7.0"
   },
   "devDependencies": {
