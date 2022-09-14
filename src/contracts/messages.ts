@@ -17,7 +17,7 @@
  * along with Paypr Contracts.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { BigNumber, BigNumberish } from 'ethers';
+import { BigNumber } from 'ethers';
 import { defaultAbiCoder, keccak256, ParamType } from 'ethers/lib/utils';
 // noinspection ES6PreferShortImport
 import { IMessage } from '../../types/contracts/contracts/facets/message/IMessage';
@@ -29,26 +29,26 @@ export enum URIType {
   Image,
 }
 
+export type PostMessageContent = Partial<MessageContentStruct>;
+
 export const withMessageContentDefaults = ({
   text,
   uri,
   uriType,
   messageRef,
-}: Partial<MessageContentStruct>): MessageContentStruct => ({
+}: PostMessageContent): MessageContentStruct => ({
   text: text || '',
   uri: uri || '',
   uriType: uriType || URIType.None,
   messageRef: messageRef || 0,
 });
 
-export const hashMessageContent = (
-  sender: string,
-  text: string = '',
-  uri: string = '',
-  uriType: URIType = URIType.None,
-  messageRef: BigNumberish = 0,
-) => {
-  if (!BigNumber.from(messageRef).eq(BigNumber.from(0)) && text === '' && uri === '') {
+export const isMessageRepost = ({ text, uri, messageRef }: MessageContentStruct) =>
+  !BigNumber.from(messageRef).eq(BigNumber.from(0)) && text === '' && uri === '';
+
+export const hashMessageContent = (sender: string, content: PostMessageContent) => {
+  const { text, uri, uriType, messageRef } = withMessageContentDefaults(content);
+  if (isMessageRepost({ text, uri, uriType, messageRef })) {
     return BigNumber.from(
       keccak256(defaultAbiCoder.encode(['address', messageContentType], [sender, { text, uri, uriType, messageRef }])),
     );

@@ -199,7 +199,14 @@ describe('post', () => {
     await message.connect(ACCOUNT1).post({ text: 'the message', uri: 'the uri', uriType: URIType.Link, messageRef: 0 });
     const id1 = await erc721Enumerable.tokenByIndex(0);
 
-    expect<BigNumber>(id1).toEqual(hashMessageContent(ACCOUNT1.address, 'the message', 'the uri', URIType.Link, 0));
+    expect<BigNumber>(id1).toEqual(
+      hashMessageContent(ACCOUNT1.address, {
+        text: 'the message',
+        uri: 'the uri',
+        uriType: URIType.Link,
+        messageRef: 0,
+      }),
+    );
     expect<string>(await message.text(id1)).toEqual('the message');
     expect<[string, URIType]>(await message.uri(id1)).toEqual(['the uri', URIType.Link]);
     expect<BigNumber>(await message.messageRef(id1)).toEqBN(0);
@@ -210,7 +217,12 @@ describe('post', () => {
     const id2 = await erc721Enumerable.tokenByIndex(1);
 
     expect<BigNumber>(id2).toEqual(
-      hashMessageContent(ACCOUNT1.address, 'the message 2', 'the uri 2', URIType.Image, id1),
+      hashMessageContent(ACCOUNT1.address, {
+        text: 'the message 2',
+        uri: 'the uri 2',
+        uriType: URIType.Image,
+        messageRef: id1,
+      }),
     );
     expect<string>(await message.text(id2)).toEqual('the message 2');
     expect<[string, URIType]>(await message.uri(id2)).toEqual(['the uri 2', URIType.Image]);
@@ -219,7 +231,9 @@ describe('post', () => {
     await message.connect(ACCOUNT1).post({ text: '', uri: '', uriType: URIType.None, messageRef: 0 });
     const id3 = await erc721Enumerable.tokenByIndex(2);
 
-    expect<BigNumber>(id3).toEqual(hashMessageContent(ACCOUNT1.address, '', '', URIType.None, 0));
+    expect<BigNumber>(id3).toEqual(
+      hashMessageContent(ACCOUNT1.address, { text: '', uri: '', uriType: URIType.None, messageRef: 0 }),
+    );
     expect<string>(await message.text(id3)).toEqual('');
     expect<[string, URIType]>(await message.uri(id3)).toEqual(['', URIType.None]);
     expect<BigNumber>(await message.messageRef(id3)).toEqBN(0);
@@ -227,7 +241,9 @@ describe('post', () => {
     await message.connect(ACCOUNT1).post({ text: '', uri: '', uriType: URIType.None, messageRef: id2 });
     const id4 = await erc721Enumerable.tokenByIndex(3);
 
-    expect<BigNumber>(id4).toEqual(hashMessageContent(ACCOUNT1.address, '', '', URIType.None, id2));
+    expect<BigNumber>(id4).toEqual(
+      hashMessageContent(ACCOUNT1.address, { text: '', uri: '', uriType: URIType.None, messageRef: id2 }),
+    );
     expect<string>(await message.text(id4)).toEqual('');
     expect<[string, URIType]>(await message.uri(id4)).toEqual(['', URIType.None]);
     expect<BigNumber>(await message.messageRef(id4)).toEqBN(id2);
@@ -243,7 +259,9 @@ describe('post', () => {
     await message.connect(ACCOUNT2).post({ text: '', uri: '', uriType: URIType.None, messageRef: id1 });
     const id2 = await erc721Enumerable.tokenByIndex(1);
 
-    expect<BigNumber>(id2).toEqual(hashMessageContent(ACCOUNT2.address, '', '', URIType.None, id1));
+    expect<BigNumber>(id2).toEqual(
+      hashMessageContent(ACCOUNT2.address, { text: '', uri: '', uriType: URIType.None, messageRef: id1 }),
+    );
     expect<string>(await message.text(id2)).toEqual('');
     expect<[string, URIType]>(await message.uri(id2)).toEqual(['', URIType.None]);
     expect<BigNumber>(await message.messageRef(id2)).toEqBN(id1);
@@ -251,7 +269,9 @@ describe('post', () => {
     await message.connect(ACCOUNT3).post({ text: '', uri: '', uriType: URIType.None, messageRef: id1 });
     const id3 = await erc721Enumerable.tokenByIndex(2);
 
-    expect<BigNumber>(id3).toEqual(hashMessageContent(ACCOUNT3.address, '', '', URIType.None, id1));
+    expect<BigNumber>(id3).toEqual(
+      hashMessageContent(ACCOUNT3.address, { text: '', uri: '', uriType: URIType.None, messageRef: id1 }),
+    );
     expect<string>(await message.text(id3)).toEqual('');
     expect<[string, URIType]>(await message.uri(id3)).toEqual(['', URIType.None]);
     expect<BigNumber>(await message.messageRef(id3)).toEqBN(id1);
@@ -267,7 +287,9 @@ describe('post', () => {
     await message.connect(ACCOUNT1).post({ text: 'the message', uri: 'the uri', uriType: URIType.Link, messageRef: 0 });
     const id2 = await erc721Enumerable.tokenByIndex(1);
 
-    expect<BigNumber>(id2).toEqual(hashMessageContent(ACCOUNT1.address, '', '', URIType.None, id1));
+    expect<BigNumber>(id2).toEqual(
+      hashMessageContent(ACCOUNT1.address, { text: '', uri: '', uriType: URIType.None, messageRef: id1 }),
+    );
     expect<string>(await message.text(id2)).toEqual('');
     expect<[string, URIType]>(await message.uri(id2)).toEqual(['', URIType.None]);
     expect<BigNumber>(await message.messageRef(id2)).toEqBN(id1);
@@ -288,7 +310,9 @@ describe('post', () => {
       .post({ text: 'the message 2', uri: 'the uri 2', uriType: URIType.Link, messageRef: id2 });
     const id3 = await erc721Enumerable.tokenByIndex(1);
 
-    expect<BigNumber>(id3).toEqual(hashMessageContent(ACCOUNT1.address, '', '', URIType.None, id1));
+    expect<BigNumber>(id3).toEqual(
+      hashMessageContent(ACCOUNT1.address, { text: '', uri: '', uriType: URIType.None, messageRef: id1 }),
+    );
     expect<string>(await message.text(id3)).toEqual('');
     expect<[string, URIType]>(await message.uri(id3)).toEqual(['', URIType.None]);
     expect<BigNumber>(await message.messageRef(id3)).toEqBN(id1);
@@ -385,7 +409,12 @@ describe('post', () => {
     ).toHaveEmittedWith(erc721, 'Transfer', [
       ZERO_ADDRESS,
       ACCOUNT1.address,
-      hashMessageContent(ACCOUNT1.address, 'the message', 'the uri', URIType.Link),
+      hashMessageContent(ACCOUNT1.address, {
+        text: 'the message',
+        uri: 'the uri',
+        uriType: URIType.Link,
+        messageRef: 0,
+      }),
     ]);
   });
 });
