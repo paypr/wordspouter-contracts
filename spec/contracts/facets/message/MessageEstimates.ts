@@ -49,7 +49,7 @@ export const messageEstimateTests: EstimateTest[] = [
       diamondCuts: [buildDiamondFacetCut(await deployMessageFacet())],
       initFunction: emptyDiamondInitFunction,
     }),
-    243371,
+    313729,
   ],
   [
     'MessageContentLimitsFacet',

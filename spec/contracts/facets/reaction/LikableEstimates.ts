@@ -9,6 +9,6 @@ export const likeableEstimateTests: EstimateTest[] = [
       diamondCuts: [buildDiamondFacetCut(await deployLikableFacet())],
       initFunction: emptyDiamondInitFunction,
     }),
-    170609,
+    194863,
   ],
 ];
