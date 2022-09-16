@@ -66,6 +66,16 @@ interface IMessage {
   function replyByIndex(uint256 id, uint256 index) external view returns (uint256);
 
   /**
+   * @notice Returns the number of reposts of the given message
+   */
+  function repostCount(uint256 id) external view returns (uint256);
+
+  /**
+   * @notice Returns the message id for repost at the given index
+   */
+  function repostByIndex(uint256 id, uint256 index) external view returns (uint256);
+
+  /**
    * @notice Posts a message on chain
    *
    * Emits ERC721 Transfer event.
@@ -81,4 +91,15 @@ interface IMessage {
    * @notice Thrown when the uri type does not match the uri
    */
   error InvalidURI(string uri, URIType uriType);
+
+  /**
+   * @notice Emitted when a message is posted.
+   */
+  event MessagePost(
+    address indexed sender,
+    string text,
+    string uri,
+    URIType indexed uriType,
+    uint256 indexed messageRef
+  );
 }

@@ -35,6 +35,7 @@ library MessageImpl {
     mapping(uint256 => MessageCore) core;
     mapping(uint256 => IMessage.MessageContent) content;
     mapping(uint256 => EnumerableSet.Bytes32Set) replies;
+    mapping(uint256 => EnumerableSet.Bytes32Set) reposts;
   }
 
   struct MessageCore {
@@ -60,6 +61,10 @@ library MessageImpl {
 
   function _replies(uint256 id) private view returns (EnumerableSet.Bytes32Set storage) {
     return _messageStorage().replies[id];
+  }
+
+  function _reposts(uint256 id) private view returns (EnumerableSet.Bytes32Set storage) {
+    return _messageStorage().reposts[id];
   }
 
   function _exists(uint256 id) private view returns (bool) {
@@ -91,6 +96,14 @@ library MessageImpl {
     return uint256(_replies(id).at(index));
   }
 
+  function repostCount(uint256 id) internal view returns (uint256) {
+    return _reposts(id).length();
+  }
+
+  function repostByIndex(uint256 id, uint256 index) internal view returns (uint256) {
+    return uint256(_reposts(id).at(index));
+  }
+
   function post(address sender, IMessage.MessageContent memory content) internal {
     uint256 id = hashContent(sender, content);
 
@@ -99,14 +112,11 @@ library MessageImpl {
         revert IMessage.MessageNotFound(content.messageRef);
       }
 
-      if (isRepost(content)) {
-        uint256 otherMessageRef = messageRef(content.messageRef);
-        if (otherMessageRef != 0) {
-          if (isRepost(_content(otherMessageRef))) {
-            content.messageRef = otherMessageRef;
-            id = hashContent(sender, content);
-          }
-        }
+      IMessage.MessageContent storage otherMessageContent = _content(content.messageRef);
+      uint256 otherMessageRef = otherMessageContent.messageRef;
+      if (otherMessageRef != 0 && isRepost(otherMessageContent)) {
+        content.messageRef = otherMessageRef;
+        id = hashContent(sender, content);
       }
     }
 
@@ -125,7 +135,9 @@ library MessageImpl {
 
     _postMessage(sender, id, content);
 
-    if (content.messageRef != 0) {
+    if (isRepost(content)) {
+      _reposts(content.messageRef).add(bytes32(id));
+    } else if (content.messageRef != 0) {
       _replies(content.messageRef).add(bytes32(id));
     }
   }
@@ -142,6 +154,8 @@ library MessageImpl {
     ds.content[id] = content;
 
     ERC721Impl.mint(sender, id);
+
+    emit MessagePost(sender, content.text, content.uri, content.uriType, content.messageRef);
   }
 
   function isRepost(IMessage.MessageContent memory content) internal pure returns (bool) {
@@ -155,4 +169,13 @@ library MessageImpl {
 
     return uint256(keccak256(abi.encode(content)));
   }
+
+  // have to redeclare here even though they are already declared in interface
+  event MessagePost(
+    address indexed sender,
+    string text,
+    string uri,
+    IMessage.URIType indexed uriType,
+    uint256 indexed messageRef
+  );
 }

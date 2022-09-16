@@ -136,26 +136,50 @@ describe('replyCount', () => {
     expect<BigNumber>(await message.replyCount(id2)).toEqBN(0);
   });
 
-  it('should increase on repost or reply', async () => {
+  it('should increase on reply', async () => {
     const message = await createMessage();
     const erc721Enumerable = asERC721Enumerable(message);
 
     await message.connect(ACCOUNT1).post({ text: 'the message', uri: 'the uri', uriType: URIType.Link, messageRef: 0 });
     const id1 = await erc721Enumerable.tokenByIndex(0);
-
-    await message.connect(ACCOUNT1).post({ text: 'the message', uri: 'the uri', uriType: URIType.Link, messageRef: 0 });
-    expect<BigNumber>(await message.replyCount(id1)).toEqBN(1);
-
-    await message.connect(ACCOUNT2).post({ text: '', uri: '', uriType: URIType.None, messageRef: id1 });
-    expect<BigNumber>(await message.replyCount(id1)).toEqBN(2);
+    expect<BigNumber>(await message.replyCount(id1)).toEqBN(0);
 
     await message.connect(ACCOUNT1).post({ text: 'the message 2', uri: '', uriType: URIType.None, messageRef: id1 });
     const id2 = await erc721Enumerable.tokenByIndex(1);
-    expect<BigNumber>(await message.replyCount(id1)).toEqBN(3);
+    expect<BigNumber>(await message.replyCount(id1)).toEqBN(1);
+    expect<BigNumber>(await message.replyCount(id2)).toEqBN(0);
 
     await message.connect(ACCOUNT1).post({ text: 'the message 3', uri: '', uriType: URIType.None, messageRef: id2 });
-    expect<BigNumber>(await message.replyCount(id1)).toEqBN(3);
+    expect<BigNumber>(await message.replyCount(id1)).toEqBN(1);
     expect<BigNumber>(await message.replyCount(id2)).toEqBN(1);
+
+    await message.connect(ACCOUNT1).post({ text: 'the message 4', uri: '', uriType: URIType.None, messageRef: id1 });
+    expect<BigNumber>(await message.replyCount(id1)).toEqBN(2);
+    expect<BigNumber>(await message.replyCount(id2)).toEqBN(1);
+  });
+
+  it('should not increase on repost', async () => {
+    const message = await createMessage();
+    const erc721Enumerable = asERC721Enumerable(message);
+
+    await message.connect(ACCOUNT1).post({ text: 'the message', uri: 'the uri', uriType: URIType.Link, messageRef: 0 });
+    const id1 = await erc721Enumerable.tokenByIndex(0);
+    expect<BigNumber>(await message.replyCount(id1)).toEqBN(0);
+
+    await message.connect(ACCOUNT1).post({ text: 'the message', uri: 'the uri', uriType: URIType.Link, messageRef: 0 });
+    expect<BigNumber>(await message.replyCount(id1)).toEqBN(0);
+
+    await message.connect(ACCOUNT2).post({ text: '', uri: '', uriType: URIType.None, messageRef: id1 });
+    expect<BigNumber>(await message.replyCount(id1)).toEqBN(0);
+
+    await message.connect(ACCOUNT1).post({ text: 'the message 2', uri: '', uriType: URIType.None, messageRef: id1 });
+    const id2 = await erc721Enumerable.tokenByIndex(1);
+    expect<BigNumber>(await message.replyCount(id1)).toEqBN(1);
+    expect<BigNumber>(await message.replyCount(id2)).toEqBN(0);
+
+    await message.connect(ACCOUNT1).post({ text: 'the message 2', uri: '', uriType: URIType.None, messageRef: id1 });
+    expect<BigNumber>(await message.replyCount(id1)).toEqBN(1);
+    expect<BigNumber>(await message.replyCount(id2)).toEqBN(0);
   });
 });
 
@@ -167,27 +191,131 @@ describe('replyByIndex', () => {
     await message.connect(ACCOUNT1).post({ text: 'the message', uri: 'the uri', uriType: URIType.Link, messageRef: 0 });
     const id1 = await erc721Enumerable.tokenByIndex(0);
 
-    await message.connect(ACCOUNT1).post({ text: 'the message', uri: 'the uri', uriType: URIType.Link, messageRef: 0 });
+    await message.connect(ACCOUNT2).post({ text: 'the message 2', uri: '', uriType: URIType.None, messageRef: id1 });
     const id2 = await erc721Enumerable.tokenByIndex(1);
     expect<BigNumber>(await message.replyByIndex(id1, 0)).toEqBN(id2);
 
-    await message.connect(ACCOUNT2).post({ text: '', uri: '', uriType: URIType.None, messageRef: id1 });
-    const id3 = await erc721Enumerable.tokenByIndex(2);
+    // repost
+    await message.connect(ACCOUNT1).post({ text: 'the message', uri: 'the uri', uriType: URIType.Link, messageRef: 0 });
     expect<BigNumber>(await message.replyByIndex(id1, 0)).toEqBN(id2);
-    expect<BigNumber>(await message.replyByIndex(id1, 1)).toEqBN(id3);
-
-    await message.connect(ACCOUNT2).post({ text: 'the message 2', uri: '', uriType: URIType.None, messageRef: id3 });
-    const id4 = await erc721Enumerable.tokenByIndex(3);
-    expect<BigNumber>(await message.replyByIndex(id1, 0)).toEqBN(id2);
-    expect<BigNumber>(await message.replyByIndex(id1, 1)).toEqBN(id3);
-    expect<BigNumber>(await message.replyByIndex(id3, 0)).toEqBN(id4);
 
     await message.connect(ACCOUNT1).post({ text: 'the message 3', uri: '', uriType: URIType.None, messageRef: id1 });
-    const id5 = await erc721Enumerable.tokenByIndex(4);
+    const id4 = await erc721Enumerable.tokenByIndex(3);
     expect<BigNumber>(await message.replyByIndex(id1, 0)).toEqBN(id2);
-    expect<BigNumber>(await message.replyByIndex(id1, 1)).toEqBN(id3);
-    expect<BigNumber>(await message.replyByIndex(id3, 0)).toEqBN(id4);
-    expect<BigNumber>(await message.replyByIndex(id1, 2)).toEqBN(id5);
+    expect<BigNumber>(await message.replyByIndex(id1, 1)).toEqBN(id4);
+
+    // repost
+    await message.connect(ACCOUNT2).post({ text: '', uri: '', uriType: URIType.None, messageRef: id1 });
+    expect<BigNumber>(await message.replyByIndex(id1, 0)).toEqBN(id2);
+    expect<BigNumber>(await message.replyByIndex(id1, 1)).toEqBN(id4);
+
+    await message.connect(ACCOUNT1).post({ text: 'the message 4', uri: '', uriType: URIType.None, messageRef: id1 });
+    const id6 = await erc721Enumerable.tokenByIndex(5);
+    expect<BigNumber>(await message.replyByIndex(id1, 0)).toEqBN(id2);
+    expect<BigNumber>(await message.replyByIndex(id1, 1)).toEqBN(id4);
+    expect<BigNumber>(await message.replyByIndex(id1, 2)).toEqBN(id6);
+
+    await message.connect(ACCOUNT1).post({ text: 'the message 5', uri: '', uriType: URIType.None, messageRef: id6 });
+    const id7 = await erc721Enumerable.tokenByIndex(6);
+    expect<BigNumber>(await message.replyByIndex(id1, 0)).toEqBN(id2);
+    expect<BigNumber>(await message.replyByIndex(id1, 1)).toEqBN(id4);
+    expect<BigNumber>(await message.replyByIndex(id1, 2)).toEqBN(id6);
+    expect<BigNumber>(await message.replyByIndex(id6, 0)).toEqBN(id7);
+  });
+});
+
+describe('repostCount', () => {
+  it('should return 0 with no repost', async () => {
+    const message = await createMessage();
+    const erc721Enumerable = asERC721Enumerable(message);
+
+    await message.connect(ACCOUNT1).post({ text: 'the message', uri: 'the uri', uriType: URIType.Link, messageRef: 0 });
+    const id1 = await erc721Enumerable.tokenByIndex(0);
+
+    expect<BigNumber>(await message.replyCount(id1)).toEqBN(0);
+
+    await message
+      .connect(ACCOUNT1)
+      .post({ text: 'the message 2', uri: 'the uri 2', uriType: URIType.Link, messageRef: 0 });
+    const id2 = await erc721Enumerable.tokenByIndex(1);
+
+    expect<BigNumber>(await message.repostCount(id1)).toEqBN(0);
+    expect<BigNumber>(await message.repostCount(id2)).toEqBN(0);
+  });
+
+  it('should increase on repost', async () => {
+    const message = await createMessage();
+    const erc721Enumerable = asERC721Enumerable(message);
+
+    await message.connect(ACCOUNT1).post({ text: 'the message', uri: 'the uri', uriType: URIType.Link, messageRef: 0 });
+    const id1 = await erc721Enumerable.tokenByIndex(0);
+    expect<BigNumber>(await message.repostCount(id1)).toEqBN(0);
+
+    await message.connect(ACCOUNT1).post({ text: 'the message', uri: 'the uri', uriType: URIType.Link, messageRef: 0 });
+    const id2 = await erc721Enumerable.tokenByIndex(1);
+    expect<BigNumber>(await message.repostCount(id1)).toEqBN(1);
+    expect<BigNumber>(await message.repostCount(id2)).toEqBN(0);
+
+    await message.connect(ACCOUNT2).post({ text: '', uri: '', uriType: URIType.None, messageRef: id1 });
+    expect<BigNumber>(await message.repostCount(id1)).toEqBN(2);
+    expect<BigNumber>(await message.repostCount(id2)).toEqBN(0);
+
+    await message.connect(ACCOUNT3).post({ text: '', uri: '', uriType: URIType.None, messageRef: id2 });
+    expect<BigNumber>(await message.repostCount(id1)).toEqBN(3);
+    expect<BigNumber>(await message.repostCount(id2)).toEqBN(0);
+  });
+
+  it('should not increase on reply', async () => {
+    const message = await createMessage();
+    const erc721Enumerable = asERC721Enumerable(message);
+
+    await message.connect(ACCOUNT1).post({ text: 'the message', uri: 'the uri', uriType: URIType.Link, messageRef: 0 });
+    const id1 = await erc721Enumerable.tokenByIndex(0);
+    expect<BigNumber>(await message.repostCount(id1)).toEqBN(0);
+
+    await message.connect(ACCOUNT1).post({ text: 'the message 2', uri: '', uriType: URIType.None, messageRef: id1 });
+    const id2 = await erc721Enumerable.tokenByIndex(1);
+    expect<BigNumber>(await message.repostCount(id1)).toEqBN(0);
+    expect<BigNumber>(await message.repostCount(id2)).toEqBN(0);
+
+    await message.connect(ACCOUNT1).post({ text: 'the message 3', uri: '', uriType: URIType.None, messageRef: id2 });
+    expect<BigNumber>(await message.repostCount(id1)).toEqBN(0);
+    expect<BigNumber>(await message.repostCount(id2)).toEqBN(0);
+  });
+});
+
+describe('repostByIndex', () => {
+  it('should return the correct message id', async () => {
+    const message = await createMessage();
+    const erc721Enumerable = asERC721Enumerable(message);
+
+    await message.connect(ACCOUNT1).post({ text: 'the message', uri: 'the uri', uriType: URIType.Link, messageRef: 0 });
+    const id1 = await erc721Enumerable.tokenByIndex(0);
+
+    await message.connect(ACCOUNT1).post({ text: 'the message', uri: 'the uri', uriType: URIType.Link, messageRef: 0 });
+    const id2 = await erc721Enumerable.tokenByIndex(1);
+    expect<BigNumber>(await message.repostByIndex(id1, 0)).toEqBN(id2);
+
+    // reply
+    await message.connect(ACCOUNT1).post({ text: 'the message 2', uri: '', uriType: URIType.None, messageRef: id1 });
+    const id3 = await erc721Enumerable.tokenByIndex(2);
+    expect<BigNumber>(await message.repostByIndex(id1, 0)).toEqBN(id2);
+
+    await message.connect(ACCOUNT1).post({ text: '', uri: '', uriType: URIType.None, messageRef: id3 });
+    const id4 = await erc721Enumerable.tokenByIndex(3);
+    expect<BigNumber>(await message.repostByIndex(id1, 0)).toEqBN(id2);
+    expect<BigNumber>(await message.repostByIndex(id3, 0)).toEqBN(id4);
+
+    // reply
+    await message.connect(ACCOUNT1).post({ text: 'the message 3', uri: '', uriType: URIType.None, messageRef: id1 });
+    expect<BigNumber>(await message.repostByIndex(id1, 0)).toEqBN(id2);
+    expect<BigNumber>(await message.repostByIndex(id3, 0)).toEqBN(id4);
+
+    await message.connect(ACCOUNT2).post({ text: '', uri: '', uriType: URIType.None, messageRef: id1 });
+    const id6 = await erc721Enumerable.tokenByIndex(5);
+    expect<BigNumber>(await message.repostByIndex(id1, 0)).toEqBN(id2);
+    expect<BigNumber>(await message.repostByIndex(id1, 1)).toEqBN(id6);
+    expect<BigNumber>(await message.repostByIndex(id3, 0)).toEqBN(id4);
   });
 });
 
@@ -308,36 +436,60 @@ describe('post', () => {
     await message
       .connect(ACCOUNT1)
       .post({ text: 'the message 2', uri: 'the uri 2', uriType: URIType.Link, messageRef: id2 });
-    const id3 = await erc721Enumerable.tokenByIndex(1);
+    const id3 = await erc721Enumerable.tokenByIndex(2);
 
-    expect<BigNumber>(id3).toEqual(
-      hashMessageContent(ACCOUNT1.address, { text: '', uri: '', uriType: URIType.None, messageRef: id1 }),
-    );
-    expect<string>(await message.text(id3)).toEqual('');
-    expect<[string, URIType]>(await message.uri(id3)).toEqual(['', URIType.None]);
+    expect<string>(await message.text(id3)).toEqual('the message 2');
+    expect<[string, URIType]>(await message.uri(id3)).toEqual(['the uri 2', URIType.Link]);
     expect<BigNumber>(await message.messageRef(id3)).toEqBN(id1);
+    expect<BigNumber>(id3).toEqual(
+      hashMessageContent(ACCOUNT1.address, {
+        text: 'the message 2',
+        uri: 'the uri 2',
+        uriType: URIType.Link,
+        messageRef: id1,
+      }),
+    );
+
+    await message.connect(ACCOUNT3).post({ text: '', uri: '', uriType: URIType.None, messageRef: id2 });
+    const id4 = await erc721Enumerable.tokenByIndex(3);
+
+    expect<string>(await message.text(id4)).toEqual('');
+    expect<[string, URIType]>(await message.uri(id4)).toEqual(['', URIType.None]);
+    expect<BigNumber>(await message.messageRef(id4)).toEqBN(id1);
+    expect<BigNumber>(id4).toEqual(
+      hashMessageContent(ACCOUNT3.address, { text: '', uri: '', uriType: URIType.None, messageRef: id1 }),
+    );
   });
 
-  it('should increase reply count when replies', async () => {
+  it('should increase reply and repost counts', async () => {
     const message = await createMessage();
     const erc721Enumerable = asERC721Enumerable(message);
 
     await message.connect(ACCOUNT1).post({ text: 'the message', uri: 'the uri', uriType: URIType.Link, messageRef: 0 });
     const id1 = await erc721Enumerable.tokenByIndex(0);
+    expect<BigNumber>(await message.replyCount(id1)).toEqBN(0);
+    expect<BigNumber>(await message.repostCount(id1)).toEqBN(0);
 
     await message.connect(ACCOUNT1).post({ text: 'the message', uri: 'the uri', uriType: URIType.Link, messageRef: 0 });
-    expect<BigNumber>(await message.replyCount(id1)).toEqBN(1);
+    expect<BigNumber>(await message.replyCount(id1)).toEqBN(0);
+    expect<BigNumber>(await message.repostCount(id1)).toEqBN(1);
 
     await message.connect(ACCOUNT2).post({ text: '', uri: '', uriType: URIType.None, messageRef: id1 });
-    expect<BigNumber>(await message.replyCount(id1)).toEqBN(2);
+    expect<BigNumber>(await message.replyCount(id1)).toEqBN(0);
+    expect<BigNumber>(await message.repostCount(id1)).toEqBN(2);
 
     await message.connect(ACCOUNT1).post({ text: 'the message 2', uri: '', uriType: URIType.None, messageRef: id1 });
     const id2 = await erc721Enumerable.tokenByIndex(1);
-    expect<BigNumber>(await message.replyCount(id1)).toEqBN(3);
+    expect<BigNumber>(await message.replyCount(id1)).toEqBN(1);
+    expect<BigNumber>(await message.repostCount(id1)).toEqBN(2);
+    expect<BigNumber>(await message.replyCount(id2)).toEqBN(0);
+    expect<BigNumber>(await message.repostCount(id2)).toEqBN(0);
 
     await message.connect(ACCOUNT1).post({ text: 'the message 3', uri: '', uriType: URIType.None, messageRef: id2 });
-    expect<BigNumber>(await message.replyCount(id1)).toEqBN(3);
-    expect<BigNumber>(await message.replyCount(id2)).toEqBN(1);
+    expect<BigNumber>(await message.replyCount(id1)).toEqBN(2);
+    expect<BigNumber>(await message.repostCount(id1)).toEqBN(2);
+    expect<BigNumber>(await message.replyCount(id2)).toEqBN(0);
+    expect<BigNumber>(await message.repostCount(id2)).toEqBN(0);
   });
 
   it('should fail if same repost for a single account', async () => {
@@ -416,5 +568,36 @@ describe('post', () => {
         messageRef: 0,
       }),
     ]);
+  });
+
+  it('should emit MessagePost event', async () => {
+    const message = await createMessage();
+    const erc721Enumerable = asERC721Enumerable(message);
+
+    await expect<ContractTransaction>(
+      await message
+        .connect(ACCOUNT1)
+        .post({ text: 'the message', uri: 'the uri', uriType: URIType.Link, messageRef: 0 }),
+    ).toHaveEmittedWith(message, 'MessagePost', [
+      ACCOUNT1.address,
+      'the message',
+      'the uri',
+      URIType.Link,
+      BigNumber.from(0),
+    ]);
+
+    const id1 = await erc721Enumerable.tokenByIndex(0);
+
+    await expect<ContractTransaction>(
+      await message
+        .connect(ACCOUNT1)
+        .post({ text: 'the message', uri: 'the uri', uriType: URIType.Link, messageRef: 0 }),
+    ).toHaveEmittedWith(message, 'MessagePost', [ACCOUNT1.address, '', '', URIType.None, id1]);
+
+    await expect<ContractTransaction>(
+      await message
+        .connect(ACCOUNT2)
+        .post({ text: 'the message 2', uri: 'the uri 2', uriType: URIType.Link, messageRef: id1 }),
+    ).toHaveEmittedWith(message, 'MessagePost', [ACCOUNT2.address, 'the message 2', 'the uri 2', URIType.Link, id1]);
   });
 });
