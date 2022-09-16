@@ -28,9 +28,14 @@ interface ILikable {
   function likeCount(uint256 tokenId) external view returns (uint256);
 
   /**
-   * @notice Returns the address for the like at the given index
+   * @notice Returns the sender address for the like at the given index
    */
   function likeByIndex(uint256 tokenId, uint256 index) external view returns (address);
+
+  /**
+   * @notice Returns whether or not the given sender has liked the given token
+   */
+  function hasLiked(uint256 tokenId, address sender) external view returns (bool);
 
   /**
    * @notice Likes a message

@@ -36,6 +36,10 @@ contract LikableFacet is ILikable {
     return ReactableImpl.tokenReactionByIndex(tokenId, LIKE_EMOJI, index);
   }
 
+  function hasLiked(uint256 tokenId, address sender) external view returns (bool) {
+    return ReactableImpl.hasTokenReaction(tokenId, LIKE_EMOJI, sender);
+  }
+
   function like(uint256 tokenId) external payable {
     address sender = ContextSupport.msgSender();
     ReactableImpl.addReaction(sender, tokenId, LIKE_EMOJI);
