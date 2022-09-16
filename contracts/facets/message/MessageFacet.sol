@@ -51,6 +51,14 @@ contract MessageFacet is IMessage {
     return MessageImpl.replyByIndex(id, index);
   }
 
+  function repostCount(uint256 id) external view returns (uint256) {
+    return MessageImpl.repostCount(id);
+  }
+
+  function repostByIndex(uint256 id, uint256 index) external view returns (uint256) {
+    return MessageImpl.repostByIndex(id, index);
+  }
+
   function post(MessageContent calldata content) external payable {
     address sender = ContextSupport.msgSender();
     MessageImpl.post(sender, content);

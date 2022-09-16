@@ -2,6 +2,7 @@ import { buildDiamondFacetCut } from '@paypr/ethereum-contracts/dist/src/contrac
 import { BigNumber, ContractTransaction } from 'ethers';
 import { LIKABLE_INTERFACE_ID } from '../../../../src/contracts/interfaces';
 import { URIType } from '../../../../src/contracts/messages';
+import { LIKE_EMOJI_ID } from '../../../../src/contracts/reactions';
 import { ACCOUNT1, ACCOUNT2, ACCOUNT3 } from '../../../helpers/Accounts';
 import { deployDiamond } from '../../../helpers/DiamondHelper';
 import { shouldSupportInterface } from '../../../helpers/ERC165Helper';
@@ -14,8 +15,6 @@ import {
   buildLikableAdditions,
   deployLikableFacet,
 } from '../../../helpers/facets/ReactableFacetHelper';
-
-const likeEmoji = 0x1f44d;
 
 describe('supportsInterface', () => {
   const createDiamondForErc165 = async () =>
@@ -146,6 +145,86 @@ describe('likeByIndex', () => {
   });
 });
 
+describe('hasLiked', () => {
+  it('should return false when no one has liked', async () => {
+    const message = await createMessage(await buildLikableAdditions());
+    const erc721Enumerable = asERC721Enumerable(message);
+    const likable = asLikable(message);
+
+    await message.connect(ACCOUNT1).post({ text: 'the message', uri: '', uriType: URIType.None, messageRef: 0 });
+    const messageId1 = await erc721Enumerable.tokenByIndex(0);
+
+    expect<boolean>(await likable.hasLiked(messageId1, ACCOUNT1.address)).toBe(false);
+    expect<boolean>(await likable.hasLiked(messageId1, ACCOUNT2.address)).toBe(false);
+
+    await message.connect(ACCOUNT1).post({ text: 'the message', uri: '', uriType: URIType.None, messageRef: 0 });
+    const messageId2 = await erc721Enumerable.tokenByIndex(1);
+
+    expect<boolean>(await likable.hasLiked(messageId2, ACCOUNT1.address)).toBe(false);
+    expect<boolean>(await likable.hasLiked(messageId2, ACCOUNT2.address)).toBe(false);
+  });
+
+  it('should return false when the sender has not liked', async () => {
+    const message = await createMessage(await buildLikableAdditions());
+    const erc721Enumerable = asERC721Enumerable(message);
+    const likable = asLikable(message);
+
+    await message.connect(ACCOUNT1).post({ text: 'the message', uri: '', uriType: URIType.None, messageRef: 0 });
+    const messageId1 = await erc721Enumerable.tokenByIndex(0);
+
+    await likable.connect(ACCOUNT1).like(messageId1);
+
+    expect<boolean>(await likable.hasLiked(messageId1, ACCOUNT2.address)).toBe(false);
+
+    await message.connect(ACCOUNT1).post({ text: 'the message', uri: '', uriType: URIType.None, messageRef: 0 });
+    const messageId2 = await erc721Enumerable.tokenByIndex(1);
+
+    expect<boolean>(await likable.hasLiked(messageId2, ACCOUNT1.address)).toBe(false);
+
+    await likable.connect(ACCOUNT1).like(messageId2);
+
+    expect<boolean>(await likable.hasLiked(messageId2, ACCOUNT2.address)).toBe(false);
+  });
+
+  it('shoudl return true when the sender has liked', async () => {
+    const message = await createMessage(await buildLikableAdditions());
+    const erc721Enumerable = asERC721Enumerable(message);
+    const likable = asLikable(message);
+
+    await message.connect(ACCOUNT1).post({ text: 'the message', uri: '', uriType: URIType.None, messageRef: 0 });
+    const messageId1 = await erc721Enumerable.tokenByIndex(0);
+
+    expect<boolean>(await likable.hasLiked(messageId1, ACCOUNT1.address)).toBe(false);
+    expect<boolean>(await likable.hasLiked(messageId1, ACCOUNT2.address)).toBe(false);
+
+    await likable.connect(ACCOUNT1).like(messageId1);
+
+    expect<boolean>(await likable.hasLiked(messageId1, ACCOUNT1.address)).toBe(true);
+    expect<boolean>(await likable.hasLiked(messageId1, ACCOUNT2.address)).toBe(false);
+
+    await likable.connect(ACCOUNT2).like(messageId1);
+
+    expect<boolean>(await likable.hasLiked(messageId1, ACCOUNT1.address)).toBe(true);
+    expect<boolean>(await likable.hasLiked(messageId1, ACCOUNT2.address)).toBe(true);
+
+    await message.connect(ACCOUNT1).post({ text: 'the message', uri: '', uriType: URIType.None, messageRef: 0 });
+    const messageId2 = await erc721Enumerable.tokenByIndex(1);
+
+    expect<boolean>(await likable.hasLiked(messageId2, ACCOUNT1.address)).toBe(false);
+    expect<boolean>(await likable.hasLiked(messageId2, ACCOUNT2.address)).toBe(false);
+
+    await likable.connect(ACCOUNT1).like(messageId2);
+
+    expect<boolean>(await likable.hasLiked(messageId2, ACCOUNT1.address)).toBe(true);
+    expect<boolean>(await likable.hasLiked(messageId2, ACCOUNT2.address)).toBe(false);
+
+    await likable.connect(ACCOUNT2).like(messageId2);
+
+    expect<boolean>(await likable.hasLiked(messageId2, ACCOUNT1.address)).toBe(true);
+    expect<boolean>(await likable.hasLiked(messageId2, ACCOUNT2.address)).toBe(true);
+  });
+});
+
 describe('like', () => {
   it('should increase like count', async () => {
     const message = await createMessage(await buildLikableAdditions());
@@ -191,7 +270,7 @@ describe('like', () => {
     await expect<ContractTransaction>(await likable.connect(ACCOUNT2).like(messageId)).toHaveEmittedWith(
       asReactable(message),
       'Reaction',
-      [ACCOUNT2.address, messageId, BigNumber.from(likeEmoji)],
+      [ACCOUNT2.address, messageId, BigNumber.from(LIKE_EMOJI_ID)],
     );
   });
 
@@ -258,7 +337,7 @@ describe('unlike', () => {
     await expect<ContractTransaction>(await likable.connect(ACCOUNT2).unlike(messageId)).toHaveEmittedWith(
       asReactable(message),
       'ReactionRemoved',
-      [ACCOUNT2.address, messageId, BigNumber.from(likeEmoji)],
+      [ACCOUNT2.address, messageId, BigNumber.from(LIKE_EMOJI_ID)],
     );
   });
 

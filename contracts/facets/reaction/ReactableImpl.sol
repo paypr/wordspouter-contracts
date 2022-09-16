@@ -72,6 +72,17 @@ library ReactableImpl {
     return _tokenReactions(tokenId).reactions[reactionId].at(index);
   }
 
+  function hasTokenReaction(
+    uint256 tokenId,
+    uint256 reactionId,
+    address sender
+  ) internal view returns (bool) {
+    ReactableStorage storage ds = _reactableStorage();
+    TokenReactions storage tr = ds.tokenReactions[tokenId];
+
+    return tr.reactions[reactionId].contains(sender);
+  }
+
   function accountReactionCount(address account) internal view returns (uint256) {
     return _reactableStorage().accountReactions[account].length();
   }
