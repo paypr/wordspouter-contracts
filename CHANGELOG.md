@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.6](https://github.com/paypr/message-contracts/compare/v0.0.5...v0.0.6) (2022-09-16)
+
+### Features
+
+- [[#1](https://github.com/paypr/message-contracts/issues/1)] added hasLiked ([0e03f7e](https://github.com/paypr/message-contracts/commit/0e03f7e000bef5e9689b262148bf35c99896e85a))
+- [[#1](https://github.com/paypr/message-contracts/issues/1)] added repost count and by index ([fd540c9](https://github.com/paypr/message-contracts/commit/fd540c9f80579eeff68ac9c4ade56463b094a488))
+
+### Bug Fixes
+
+- [[#1](https://github.com/paypr/message-contracts/issues/1)] tests ([e0656c9](https://github.com/paypr/message-contracts/commit/e0656c9fa2bc185fa6d49fa01a900a724f63462c))
+- **deps:** update dependency @paypr/ethereum-contracts to v1.2.1 ([81c63e9](https://github.com/paypr/message-contracts/commit/81c63e901a877362a972b93900a1b3cffd9796de))
+
 ### [0.0.5](https://github.com/paypr/message-contracts/compare/v0.0.4...v0.0.5) (2022-09-09)
 
 ### Bug Fixes
