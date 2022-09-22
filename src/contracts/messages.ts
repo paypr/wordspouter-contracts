@@ -17,11 +17,8 @@
  * along with Paypr Contracts.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import { BigNumber } from 'ethers';
+import { BigNumber, BigNumberish } from 'ethers';
 import { defaultAbiCoder, keccak256, ParamType } from 'ethers/lib/utils';
-// noinspection ES6PreferShortImport
-import { IMessage } from '../../types/contracts/contracts/facets/message/IMessage';
-import MessageContentStruct = IMessage.MessageContentStruct;
 
 export enum URIType {
   None,
@@ -29,21 +26,23 @@ export enum URIType {
   Image,
 }
 
-export type PostMessageContent = Partial<MessageContentStruct>;
+export interface MessageContent {
+  text: string;
+  uri: string;
+  uriType: URIType;
+  messageRef: BigNumberish;
+}
 
-export const withMessageContentDefaults = ({
-  text,
-  uri,
-  uriType,
-  messageRef,
-}: PostMessageContent): MessageContentStruct => ({
+export type PostMessageContent = Partial<MessageContent>;
+
+export const withMessageContentDefaults = ({ text, uri, uriType, messageRef }: PostMessageContent): MessageContent => ({
   text: text || '',
   uri: uri || '',
   uriType: uriType || URIType.None,
   messageRef: messageRef || 0,
 });
 
-export const isMessageRepost = ({ text, uri, messageRef }: MessageContentStruct) =>
+export const isMessageRepost = ({ text, uri, messageRef }: MessageContent) =>
   !BigNumber.from(messageRef).eq(BigNumber.from(0)) && text === '' && uri === '';
 
 export const hashMessageContent = (sender: string, content: PostMessageContent) => {
