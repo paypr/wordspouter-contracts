@@ -3,7 +3,7 @@
   "name": "@paypr/message-contracts",
   "description": "",
   "license": "GPL-3.0-only",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "homepage": "https://paypr.money/",
   "repository": {
     "type": "git",

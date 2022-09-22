@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [0.0.7](https://github.com/paypr/message-contracts/compare/v0.0.6...v0.0.7) (2022-09-22)
+
+### Bug Fixes
+
+- **deps:** update dependency @paypr/ethereum-contracts to v1.3.0 ([cd35db1](https://github.com/paypr/message-contracts/commit/cd35db1cb4dd27ba0e359da98c048f3d105edb7f))
+
 ### [0.0.6](https://github.com/paypr/message-contracts/compare/v0.0.5...v0.0.6) (2022-09-16)
 
 ### Features
