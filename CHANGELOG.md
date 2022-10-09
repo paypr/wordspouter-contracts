@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.1.0](https://github.com/paypr/message-contracts/compare/v0.0.7...v0.1.0) (2022-10-09)
+
+### ⚠ BREAKING CHANGES
+
+- Extract reply and repost functions to separate contract
+
+### Features
+
+- [[#1](https://github.com/paypr/message-contracts/issues/1)] split out reply and repost functions ([c8e11f2](https://github.com/paypr/message-contracts/commit/c8e11f29f1803962528d4ae90742f13963b981da))
+
+### Bug Fixes
+
+- **deps:** update dependency @paypr/ethereum-contracts to v1.4.0 ([1fe1e98](https://github.com/paypr/message-contracts/commit/1fe1e980a84a26ad9ac6d07c2a1bbd02d5736b09))
+
 ### [0.0.7](https://github.com/paypr/message-contracts/compare/v0.0.6...v0.0.7) (2022-09-22)
 
 ### Bug Fixes
