@@ -26,6 +26,7 @@ import '../facets/message/IMessage.sol';
 import '../facets/message/cost/IMessageCost.sol';
 import '../facets/message/limits/IMessageContentLimits.sol';
 import '../facets/reaction/IReactable.sol';
+import '../facets/message/IMessageReplies.sol';
 
 contract ERC165IdCalc {
   function calcLikableInterfaceId() external pure returns (bytes4) {
@@ -42,6 +43,10 @@ contract ERC165IdCalc {
 
   function calcMessageCostInterfaceId() external pure returns (bytes4) {
     return type(IMessageCost).interfaceId;
+  }
+
+  function calcMessageRepliesInterfaceId() external pure returns (bytes4) {
+    return type(IMessageReplies).interfaceId;
   }
 
   function calcReactableInterfaceId() external pure returns (bytes4) {

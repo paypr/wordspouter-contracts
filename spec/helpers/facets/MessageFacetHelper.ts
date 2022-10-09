@@ -28,37 +28,46 @@ import {
   IMessage__factory,
   IMessageContentLimits__factory,
   IMessageCost__factory,
+  IMessageReplies__factory,
   MessageContentLimitsERC721Hooks__factory,
   MessageContentLimitsFacet__factory,
   MessageContentLimitsInit__factory,
   MessageCostInit__factory,
   MessageFacet__factory,
+  MessageRepliesFacet__factory,
 } from '../../../types/contracts';
 import { INITIALIZER } from '../Accounts';
 import { combineExtensibleDiamondOptions, createDiamond, ExtensibleDiamondOptions } from '../DiamondHelper';
 import { buildERC721Additions, deployERC721Init } from './ERC721FacetHelper';
 
-export const asMessage = (contract: Contract, signer: Signer = INITIALIZER) =>
+export const asMessage = (contract: Contract, signer: Signer = contract.signer) =>
   IMessage__factory.connect(contract.address, signer);
 
-export const asMessageContentLimits = (contract: Contract, signer: Signer = INITIALIZER) =>
+export const asMessageReplies = (contract: Contract, signer: Signer = contract.signer) =>
+  IMessageReplies__factory.connect(contract.address, signer);
+
+export const asMessageContentLimits = (contract: Contract, signer: Signer = contract.signer) =>
   IMessageContentLimits__factory.connect(contract.address, signer);
 
-export const asMessageCost = (contract: Contract, signer: Signer = INITIALIZER) =>
+export const asMessageCost = (contract: Contract, signer: Signer = contract.signer) =>
   IMessageCost__factory.connect(contract.address, signer);
 
 export const createMessage = async (options: ExtensibleDiamondOptions = {}) =>
   asMessage(
     await createDiamond(
       combineExtensibleDiamondOptions(
-        {
-          additionalCuts: [buildDiamondFacetCut(await deployMessageFacet())],
-          additionalInits: [],
-        },
+        { additionalCuts: [buildDiamondFacetCut(await deployMessageFacet())] },
         combineExtensibleDiamondOptions(await buildERC721Additions(), options),
       ),
     ),
   );
+
+export const createMessageWithReplies = async (options: ExtensibleDiamondOptions = {}) =>
+  createMessage(combineExtensibleDiamondOptions(await buildMessageRepliesAdditions(), options));
+
+export const buildMessageRepliesAdditions = async (): Promise<ExtensibleDiamondOptions> => ({
+  additionalCuts: [buildDiamondFacetCut(await deployMessageRepliesFacet())],
+});
 
 export const buildMessageCostAdditions = async (cost: BigNumberish): Promise<ExtensibleDiamondOptions> => ({
   additionalCuts: [buildDiamondFacetCut(await deployBasicMessageCostFacet())],
@@ -86,3 +95,4 @@ export const deployMessageContentLimitsERC721Hooks = () =>
 export const deployMessageContentLimitsInit = () => new MessageContentLimitsInit__factory(INITIALIZER).deploy();
 export const deployMessageCostInit = () => new MessageCostInit__factory(INITIALIZER).deploy();
 export const deployMessageFacet = () => new MessageFacet__factory(INITIALIZER).deploy();
+export const deployMessageRepliesFacet = () => new MessageRepliesFacet__factory(INITIALIZER).deploy();

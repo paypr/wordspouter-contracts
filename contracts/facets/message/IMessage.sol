@@ -56,26 +56,6 @@ interface IMessage {
   function createdAt(uint256 id) external view returns (uint256);
 
   /**
-   * @notice Returns the number of replies for the given message
-   */
-  function replyCount(uint256 id) external view returns (uint256);
-
-  /**
-   * @notice Returns the message id for reply at the given index
-   */
-  function replyByIndex(uint256 id, uint256 index) external view returns (uint256);
-
-  /**
-   * @notice Returns the number of reposts of the given message
-   */
-  function repostCount(uint256 id) external view returns (uint256);
-
-  /**
-   * @notice Returns the message id for repost at the given index
-   */
-  function repostByIndex(uint256 id, uint256 index) external view returns (uint256);
-
-  /**
    * @notice Posts a message on chain
    *
    * Emits ERC721 Transfer event.

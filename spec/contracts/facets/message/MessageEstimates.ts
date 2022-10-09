@@ -13,6 +13,7 @@ import {
   deployMessageContentLimitsInit,
   deployMessageCostInit,
   deployMessageFacet,
+  deployMessageRepliesFacet,
 } from '../../../helpers/facets/MessageFacetHelper';
 
 export const messageEstimateTests: EstimateTest[] = [
@@ -49,7 +50,7 @@ export const messageEstimateTests: EstimateTest[] = [
       diamondCuts: [buildDiamondFacetCut(await deployMessageFacet())],
       initFunction: emptyDiamondInitFunction,
     }),
-    313729,
+    194863,
   ],
   [
     'MessageContentLimitsFacet',
@@ -77,5 +78,13 @@ export const messageEstimateTests: EstimateTest[] = [
       ]),
     }),
     209600,
+  ],
+  [
+    'MessageRepliesFacet',
+    async () => ({
+      diamondCuts: [buildDiamondFacetCut(await deployMessageRepliesFacet())],
+      initFunction: emptyDiamondInitFunction,
+    }),
+    170609,
   ],
 ];
