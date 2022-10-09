@@ -23,6 +23,7 @@ import {
   MESSAGE_CONTENT_LIMITS_INTERFACE_ID,
   MESSAGE_COST_INTERFACE_ID,
   MESSAGE_INTERFACE_ID,
+  MESSAGE_REPLIES_INTERFACE_ID,
 } from '../../../src/contracts/interfaces';
 import { ERC165IdCalc, ERC165IdCalc__factory } from '../../../types/contracts';
 import { INITIALIZER } from '../../helpers/Accounts';
@@ -40,6 +41,7 @@ const interfaceTests: InterfaceTest[] = [
     (idCalc) => idCalc.calcMessageContentLimitsInterfaceId(),
   ],
   ['MessageCost', MESSAGE_COST_INTERFACE_ID, (idCalc) => idCalc.calcMessageCostInterfaceId()],
+  ['MessageReplies', MESSAGE_REPLIES_INTERFACE_ID, (idCalc) => idCalc.calcMessageRepliesInterfaceId()],
 ];
 
 describe('calculations', () => {

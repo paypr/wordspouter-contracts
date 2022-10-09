@@ -21,29 +21,23 @@
 
 pragma solidity ^0.8.9;
 
-import '@paypr/ethereum-contracts/contracts/facets/context/ContextSupport.sol';
-import './IMessage.sol';
+import './IMessageReplies.sol';
 import './MessageImpl.sol';
 
-contract MessageFacet is IMessage {
-  function text(uint256 id) external view returns (string memory) {
-    return MessageImpl.text(id);
+contract MessageRepliesFacet is IMessageReplies {
+  function replyCount(uint256 id) external view returns (uint256) {
+    return MessageImpl.replyCount(id);
   }
 
-  function uri(uint256 id) external view returns (string memory, URIType) {
-    return MessageImpl.uri(id);
+  function replyByIndex(uint256 id, uint256 index) external view returns (uint256) {
+    return MessageImpl.replyByIndex(id, index);
   }
 
-  function messageRef(uint256 id) external view returns (uint256) {
-    return MessageImpl.messageRef(id);
+  function repostCount(uint256 id) external view returns (uint256) {
+    return MessageImpl.repostCount(id);
   }
 
-  function createdAt(uint256 id) external view returns (uint256) {
-    return MessageImpl.createdAt(id);
-  }
-
-  function post(MessageContent calldata content) external payable {
-    address sender = ContextSupport.msgSender();
-    MessageImpl.post(sender, content);
+  function repostByIndex(uint256 id, uint256 index) external view returns (uint256) {
+    return MessageImpl.repostByIndex(id, index);
   }
 }
