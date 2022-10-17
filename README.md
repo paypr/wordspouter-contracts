@@ -59,3 +59,35 @@ npm test
 ```
 npm run build
 ```
+
+## Verification
+
+Set up a `.secrets.json` file that looks similar to `example.secrets.json`:
+
+After deploying your contract, you can verify it by running the following.
+
+### Rinkeby
+```
+npx hardhat verify --network goerli CONTRACT_ADDRESS
+```
+
+For a diamond contract, you'll need to pass the arguments to the diamond contract, and pass the contract as well:
+
+```
+npx hardhat verify --network goerli \
+  --contract @paypr/ethereum-contracts/contracts/core/diamond/Diamond.sol:Diamond \
+  --constructor-args examples/messageConstructorArgs.js \
+  CONTRACT_ADDRESS
+```
+
+### Polygon
+```
+npx hardhat verify --network polygon CONTRACT_ADDRESS
+```
+
+```
+npx hardhat verify --network polygon \
+  --contract @paypr/ethereum-contracts/contracts/core/diamond/Diamond.sol:Diamond \
+  --constructor-args examples/messageConstructorArgs.js \
+  CONTRACT_ADDRESS
+```
